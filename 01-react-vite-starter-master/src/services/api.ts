@@ -22,8 +22,12 @@ export const logoutAPI = () => {
     return axios.post<IBackendRes<IRegister>>('api/v1/auth/logout');
 }
 
+export const getUserAPI = (query: string) => {
+    return axios.get<IBackendRes<IModelPaginate<IUserTable>>>(`api/v1/user?${query}`);
+}
 
-export const getUserAPI = (current : number, pageSize : number) => {
-    return axios.get<IBackendRes<IModelPaginate<IUserTable>>>(`api/v1/user?current=${current}&pageSize=${pageSize}`);
+//create user
+export const createUserAPI = ( fullName: string,email: string,password : string, phone : string) => {
+    return axios.post<IBackendRes<IRegister>>('api/v1/user', { fullName,email,password,  phone });
 }
 

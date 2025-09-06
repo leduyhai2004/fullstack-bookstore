@@ -4,11 +4,41 @@ import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import { Button, Space, Tag } from 'antd';
 import { useRef, useState } from 'react';
 import { getUserAPI } from '../../../services/api';
+import { dateRangeValidate } from '../../../services/helper';
+import DetailUser from './detail.user';
+import CreateUser from './create.user';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 
-const columns: ProColumns<IUserTable>[] = [
+
+
+
+type TSearch =  {
+    fullName : string,
+    email : string,
+    phone : string,
+    createdAt : string,
+    createdAtRange : string;
+}
+
+
+
+const TableUser = () => {
+    const actionRef = useRef<ActionType>();
+    const [meta, setMeta] = useState({
+        current : 1,
+        pageSize: 5,
+        pages : 0,
+        total : 0
+    })
+
+    const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
+    const [dataViewDetail, setDataViewDetail] = useState<IUserTable | null>(null);
+
+    const [openModelCreate, setOpenModelCreate] = useState<boolean>(false);
+
+    const columns: ProColumns<IUserTable>[] = [
     {
         dataIndex: 'index',
         valueType: 'indexBorder',
@@ -18,8 +48,15 @@ const columns: ProColumns<IUserTable>[] = [
         //make Id is <a></a> tag
         title: 'Id',
         dataIndex: '_id',
-        render: (text) => <a href={`/user/${text}`}>{text}</a>,
-
+        hideInSearch: true,
+        render(dom, entity) {
+            return <a
+             onClick={() => {
+                setDataViewDetail(entity);
+                setOpenViewDetail(true);
+            }}
+            href='#'>{entity._id}</a>;
+        },
     },
     {
         title: 'Full Name',
@@ -36,8 +73,15 @@ const columns: ProColumns<IUserTable>[] = [
     {
         title: 'Created At',
         dataIndex: 'createdAt',
-        //format date for me
-        render: (text: unknown) => <span>{text ? new Date(text as string | number | Date).toLocaleString() : ''}</span>,
+        valueType: 'date', // để hiển thị đúng ngày giờ
+        hideInSearch: true,    // không hiện ô search cho cột này
+        sorter : true,        // hiện mũi tên sắp xếp
+    },
+    {
+        title: 'Created At',
+        dataIndex: 'createdAtRange',
+        valueType: 'dateRange', // để hiện search theo khoảng
+        hideInTable: true,      // không hiện trên bảng
     },
     {
         title: 'Action',
@@ -58,28 +102,48 @@ const columns: ProColumns<IUserTable>[] = [
                 />
             </Space>,
         ],
+        hideInSearch: true,
     },
-];
+    ];
 
-
-
-const TableUser = () => {
-    const actionRef = useRef<ActionType>();
-    const [meta, setMeta] = useState({
-        current : 1,
-        pageSize: 5,
-        pages : 0,
-        total : 0
-    })
+    const refreshTable = () => {
+        actionRef.current?.reload();
+    }
     return (
         <>
-            <ProTable<IUserTable>
+            <ProTable<IUserTable, TSearch>
                 columns={columns}
                 actionRef={actionRef}
                 cardBordered
                 request={async (params, sort, filter) => {
                     console.log(params, sort, filter);
-                    const res = await getUserAPI(params?.current ?? 1, params?.pageSize ?? 5);
+
+                    let query = '';
+                    if(params){
+                        query += `current=${params.current}&pageSize=${params.pageSize}`;
+                        if(params.email){
+                            query += `&email=/${params.email}/i`;
+                        }
+                        if(params.fullName){
+                            query += `&fullName=/${params.fullName}/i`;
+                        }
+                        if(params.phone){
+                            query += `&phone=/${params.phone}/i`;
+                        }
+                        const createdDateRange = dateRangeValidate(params.createdAtRange);
+                        if(createdDateRange){
+                            query += `&createdAt>=${createdDateRange[0]}&createdAt[<=]=${createdDateRange[1]}`;
+                        }
+                    }
+                    //default
+                    query += `&sort=-createdAt`;
+
+                    if(sort && sort.createdAt){
+                        query += `&sort=${sort.createdAt === 'ascend' ? 'createdAt' : '-createdAt'}`;
+                    }
+
+
+                    const res = await getUserAPI(query);
                     if(res && res.data){
                         setMeta(res.data.meta);
                     }
@@ -107,7 +171,7 @@ const TableUser = () => {
                         key="button"
                         icon={<PlusOutlined />}
                         onClick={() => {
-                            actionRef.current?.reload();
+                            setOpenModelCreate(true);
                         }}
                         type="primary"
                     >
@@ -115,6 +179,18 @@ const TableUser = () => {
                     </Button>
 
                 ]}
+            />
+            <DetailUser
+                openViewDetail={openViewDetail}
+                setOpenViewDetail={setOpenViewDetail}
+                dataViewDetail={dataViewDetail}
+                setDataViewDetail={setDataViewDetail}
+            />
+
+            <CreateUser
+                openModelCreate={openModelCreate}
+                setOpenModelCreate={setOpenModelCreate}
+                refreshTable={refreshTable}
             />
         </>
     );

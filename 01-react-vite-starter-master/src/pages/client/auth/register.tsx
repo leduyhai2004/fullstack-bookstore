@@ -20,23 +20,23 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   const onFinish : FormProps<FieldType>['onFinish'] = async (values) => {
-  setIsSubmit(true)
+    setIsSubmit(true)
 
-  const { fullName, email, password, phone } = values;
-  const res = await registerAPI(fullName, email, password, phone);
-  if(res.data){
-    message.success('Register successfully');
-    navigate('/login');
-  }else{
-    message.error('Register failed');
-  }
+    const { fullName, email, password, phone } = values;
+    const res = await registerAPI(fullName, email, password, phone);
+    if(res.data){
+      message.success('Register successfully');
+      navigate('/login');
+    }else{
+      message.error('Register failed');
+    }
 
 
-  console.log('Success:', values);
-  // Simulate API call
-  setTimeout(() => {
-    setIsSubmit(false);
-  }, 2000);
+    console.log('Success:', values);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmit(false);
+    }, 2000);
   }
   
   return (
