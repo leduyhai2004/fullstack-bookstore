@@ -24,8 +24,10 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "prefer-const": "off", // Tắt rule prefer-const cho toàn bộ project
+      "@typescript-eslint/no-explicit-any": "off",
     },
   }
 );

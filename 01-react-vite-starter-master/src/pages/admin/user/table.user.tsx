@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, DeleteOutlined, EditOutlined, ExportOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import { Button, Space, Tag } from 'antd';
@@ -7,13 +7,11 @@ import { getUserAPI } from '../../../services/api';
 import { dateRangeValidate } from '../../../services/helper';
 import DetailUser from './detail.user';
 import CreateUser from './create.user';
+import ImportUser from '../data/import.user';
+import { CSVLink } from 'react-csv';
+import UpdateUser from './update.user';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-
-
-
-
 type TSearch =  {
     fullName : string,
     email : string,
@@ -36,7 +34,14 @@ const TableUser = () => {
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
     const [dataViewDetail, setDataViewDetail] = useState<IUserTable | null>(null);
 
+    const [openUpdateUser, setOpenUpdateUser] = useState<boolean>(false);
+    const [dataUpdateUser, setDataUpdateUser] = useState<IUserTable | null>(null);
+
     const [openModelCreate, setOpenModelCreate] = useState<boolean>(false);
+
+    const [openModelImport, setOpenModelImport] = useState<boolean>(false);
+
+    const[currentDataTabe, setCurrentDataTable] = useState<IUserTable[]>([]);
 
     const columns: ProColumns<IUserTable>[] = [
     {
@@ -85,24 +90,27 @@ const TableUser = () => {
     },
     {
         title: 'Action',
-        //icon delete and update on antd(like button with icon) and I want color
-        render: (text, record, _, action) => [
-            <Space size="middle">
-                <Button
-                    key="edit"
-                    icon={<EditOutlined />}
-                    style={{ color: 'blue' }}
-                    // onClick={() => action?.startEditable?.(record._id)}
-                />
-                <Button
-                    key="delete"
-                    icon={<DeleteOutlined />}
-                    // onClick={() => handleDelete(record._id)}
-                    style={{ color: 'red' }}
-                />
-            </Space>,
-        ],
         hideInSearch: true,
+        render: (dom, entity) => {
+            return (
+                <Space>
+                    <Button
+                        icon={<DeleteOutlined />}
+                        onClick={() => {
+                            setDataViewDetail(entity);
+                            setOpenViewDetail(true);
+                        }}
+                    ></Button>
+                    <Button
+                        icon={<EditOutlined />}
+                        onClick={() => {
+                            setDataUpdateUser(entity);
+                            setOpenUpdateUser(true);
+                        }}
+                    ></Button>
+                </Space>
+            );
+        },
     },
     ];
 
@@ -146,6 +154,7 @@ const TableUser = () => {
                     const res = await getUserAPI(query);
                     if(res && res.data){
                         setMeta(res.data.meta);
+                        setCurrentDataTable(res.data.result);
                     }
                     return {
                         data: res.data?.result,
@@ -176,6 +185,31 @@ const TableUser = () => {
                         type="primary"
                     >
                         Add new
+                    </Button>,
+
+                    <Button
+                        key="button"
+                        icon={<CloudUploadOutlined />}
+                        onClick={() => {
+                            setOpenModelImport(true);
+                        }}
+                        type='dashed'
+                    >
+                        Import
+                    </Button>,
+
+                    <Button
+                        key="button"
+                        icon={<ExportOutlined />}
+                        type='dashed'
+                    >
+                        <CSVLink
+                            data={currentDataTabe}
+                            filename={"users.csv"}
+                        >
+                            Export
+                        </CSVLink>
+                            
                     </Button>
 
                 ]}
@@ -190,6 +224,20 @@ const TableUser = () => {
             <CreateUser
                 openModelCreate={openModelCreate}
                 setOpenModelCreate={setOpenModelCreate}
+                refreshTable={refreshTable}
+            />
+
+            <UpdateUser
+                openUpdateUser={openUpdateUser}
+                setOpenUpdateUser={setOpenUpdateUser}
+                dataUpdateUser={dataUpdateUser}
+                setDataUpdateUser={setDataUpdateUser}
+                refreshTable={refreshTable}
+            />
+
+            <ImportUser
+                openModelImport={openModelImport}
+                setOpenModelImport={setOpenModelImport}
                 refreshTable={refreshTable}
             />
         </>

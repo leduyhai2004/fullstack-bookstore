@@ -31,3 +31,16 @@ export const createUserAPI = ( fullName: string,email: string,password : string,
     return axios.post<IBackendRes<IRegister>>('api/v1/user', { fullName,email,password,  phone });
 }
 
+export const createListUserAPI = ( data: {
+    fullName: string;
+    email: string;
+    phone: string;
+    password: string;
+}[]) => {
+    return axios.post<IBackendRes<IResponseImport>>('api/v1/user/bulk-create', data);
+}
+
+
+export const updateUserAPI = ( _id: string, fullName : string, phone : string ) => {
+    return axios.put<IBackendRes<IRegister>>(`api/v1/user}`, { _id ,fullName, phone });
+}

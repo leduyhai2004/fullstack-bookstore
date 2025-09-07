@@ -9,6 +9,12 @@ interface IBackendRes<T> {
     data?: T;
 }
 
+interface IResponseImport {
+    countSuccess: number;
+    countFail: number;
+    detail : any;
+}
+
 interface IModelPaginate<T> {
     meta: {
         current: number;
