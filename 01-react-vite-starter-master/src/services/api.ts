@@ -42,5 +42,9 @@ export const createListUserAPI = ( data: {
 
 
 export const updateUserAPI = ( _id: string, fullName : string, phone : string ) => {
-    return axios.put<IBackendRes<IRegister>>(`api/v1/user}`, { _id ,fullName, phone });
+    return axios.put<IBackendRes<IRegister>>(`api/v1/user`, { _id ,fullName, phone });
+}
+
+export const deleteUserAPI = ( _id: string ) => {
+    return axios.delete<IBackendRes<IRegister>>(`api/v1/user/${_id}`);
 }

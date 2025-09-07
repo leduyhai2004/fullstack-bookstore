@@ -3,7 +3,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import { Button, Space, Tag } from 'antd';
 import { useRef, useState } from 'react';
-import { getUserAPI } from '../../../services/api';
+import { deleteUserAPI, getUserAPI } from '../../../services/api';
 import { dateRangeValidate } from '../../../services/helper';
 import DetailUser from './detail.user';
 import CreateUser from './create.user';
@@ -96,9 +96,11 @@ const TableUser = () => {
                 <Space>
                     <Button
                         icon={<DeleteOutlined />}
-                        onClick={() => {
-                            setDataViewDetail(entity);
-                            setOpenViewDetail(true);
+                        onClick={async () => {
+                            console.log('delete', entity);
+                            // Call delete API here
+                            await deleteUserAPI(entity._id);
+                            refreshTable();
                         }}
                     ></Button>
                     <Button

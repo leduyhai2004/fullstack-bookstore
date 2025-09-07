@@ -22,39 +22,66 @@ const UpdateUser = (props : IProps) => {
     const {message, notification} = App.useApp();
 
     const [form] = Form.useForm();
+    
+    // Debug để kiểm tra dữ liệu
     useEffect(() => {
+        console.log('dataUpdateUser:', dataUpdateUser);
         if (dataUpdateUser) {
-            form.setFieldsValue({
-                _id : dataUpdateUser._id,
-                fullName: dataUpdateUser.fullName,
-                email: dataUpdateUser.email,
-                phone: dataUpdateUser.phone,
-            });
+            // Thêm setTimeout để đảm bảo form đã được render
+                form.setFieldsValue({
+                    _id: dataUpdateUser._id,
+                    fullName: dataUpdateUser.fullName,
+                    email: dataUpdateUser.email,
+                    phone: dataUpdateUser.phone,
+                });
         }
     }, [dataUpdateUser, form]);
+
+    // Reset form khi đóng modal
+    useEffect(() => {
+        if (!openUpdateUser) {
+            form.resetFields();
+        }
+    }, [openUpdateUser, form]);
 
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         const { _id, fullName, phone } = values;
         setIsSubmit(true);
-        const res = await updateUserAPI(_id,  fullName, phone );
-        if (res.data) {
-            notification.success({
-                message: 'Update User',
-                description: `User ${res.data.fullName} updated successfully`,
+        try {
+            const res = await updateUserAPI(_id, fullName, phone);
+            if (res && res.data) {
+                notification.success({
+                    message: 'Update User',
+                    description: `User ${res.data.fullName} updated successfully`,
+                    duration: 5,
+                });
+                form.resetFields();
+                setOpenUpdateUser(false);
+                setDataUpdateUser(null);
+                refreshTable();
+            } else {
+                notification.error({
+                    message: 'Update Failed',
+                    description: 'Failed to update user',
+                    duration: 5,
+                });
+            }
+        } catch (error) {
+            console.error('Update error:', error);
+            notification.error({
+                message: 'Update Failed',
+                description: 'An error occurred while updating user',
                 duration: 5,
             });
-            form.resetFields();
-            setOpenUpdateUser(false);
-            setDataUpdateUser(null);
-            refreshTable();
+        } finally {
+            setIsSubmit(false);
         }
-        }
+    }
 
     return (
         <>
         <Modal
         title="Update User"
-        closable={{ 'aria-label': 'Custom Close Button' }}
         open={openUpdateUser}
         onOk={() => {
             form.submit();
@@ -64,6 +91,7 @@ const UpdateUser = (props : IProps) => {
             form.resetFields();
             setDataUpdateUser(null);
         }}
+        confirmLoading={isSubmit}
       >
         <Form
         form={form}
@@ -71,10 +99,8 @@ const UpdateUser = (props : IProps) => {
           labelCol={{ span: 24 }}
           wrapperCol={{ span: 24 }}
           layout="vertical"
-          initialValues={{ remember: true }}
           onFinish={onFinish}
           autoComplete="off"
-          preserve={false}
         >
 
             <Form.Item<FieldType> name="_id" hidden>
@@ -98,7 +124,7 @@ const UpdateUser = (props : IProps) => {
                 { type: 'email', message: 'Please input a valid email!' },
             ]}
             >
-            <Input />
+            <Input disabled />
             </Form.Item>
 
             <Form.Item<FieldType>
