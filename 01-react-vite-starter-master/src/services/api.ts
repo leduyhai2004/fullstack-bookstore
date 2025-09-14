@@ -48,3 +48,9 @@ export const updateUserAPI = ( _id: string, fullName : string, phone : string ) 
 export const deleteUserAPI = ( _id: string ) => {
     return axios.delete<IBackendRes<IRegister>>(`api/v1/user/${_id}`);
 }
+
+
+//books
+export const getBookAPI = (query: string) => {
+    return axios.get<IBackendRes<IModelPaginate<IBookTable>>>(`api/v1/book?${query}`);
+}

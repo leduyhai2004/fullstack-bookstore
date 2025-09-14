@@ -1,7 +1,9 @@
+import TableBook from "./book/table.book";
+
 const ManageBookPage = () => {
     return (
         <div>
-            ManageBookPage
+            <TableBook />
         </div>
     )
 }
