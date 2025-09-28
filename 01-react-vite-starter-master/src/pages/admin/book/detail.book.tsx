@@ -27,7 +27,6 @@ const DetailBook = (props: IProps) => {
     const { openViewDetail, setOpenViewDetail, dataViewDetail, setDataViewDetail } = props;
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
-    const [previewTitle, setPreviewTitle] = useState('');
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
     useEffect(() => {
@@ -76,7 +75,6 @@ const DetailBook = (props: IProps) => {
         setDataViewDetail(null);
     }
     return (
-        <>
             <Drawer
                 title="Basic Drawer"
                 closable={{ 'aria-label': 'Close Button' }}
@@ -119,7 +117,6 @@ const DetailBook = (props: IProps) => {
                             />
                         )}
             </Drawer>
-        </>
     );
 };
 

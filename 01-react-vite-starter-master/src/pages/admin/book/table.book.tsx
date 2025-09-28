@@ -243,6 +243,7 @@ const TableBook = () => {
             <CreateBook
                 openModelCreate={openModelCreate}
                 setOpenModelCreate={setOpenModelCreate}
+                refreshTable={refreshTable}
             />
 
             {/* <UpdateBook

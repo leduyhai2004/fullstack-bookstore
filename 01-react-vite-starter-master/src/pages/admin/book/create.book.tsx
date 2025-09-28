@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCategoryAPI, uploadFileAPI } from "../../../services/api";
+import { createBookAPI, getCategoryAPI, uploadFileAPI } from "../../../services/api";
 import { App, Form, Input, Modal, Row, Col, Divider } from "antd";
 import type { FormProps } from 'antd';
 import { InputNumber, InputNumberProps, Select } from "antd/lib";
@@ -7,10 +7,12 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Image, Upload } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import { UploadRequestOption as RcCustomRequestOptions } from "rc-upload/lib/interface";
+import { UploadChangeParam } from "antd/es/upload";
 
 interface IProps {
     openModelCreate: boolean;
     setOpenModelCreate: (open: boolean) => void;
+    refreshTable: () => void;
 }
 interface FieldType {
     mainText: string;
@@ -64,11 +66,6 @@ const CreateBook = (props: IProps) => {
         setPreviewOpen(true);
     };
 
-    const handleChangeThumbnail: UploadProps["onChange"] = ({ fileList: newFileList }) =>
-        setFileListThumbnail(newFileList);
-
-    const handleChangeSlider: UploadProps["onChange"] = ({ fileList: newFileList }) =>
-        setFileListSliders(newFileList);
 
     const uploadButton = (
         <button style={{ border: 0, background: "none" }} type="button">
@@ -77,7 +74,7 @@ const CreateBook = (props: IProps) => {
         </button>
     );
 
-    const { openModelCreate, setOpenModelCreate} = props;
+    const { openModelCreate, setOpenModelCreate, refreshTable } = props;
     const [form] = Form.useForm();
 
     const onChange: InputNumberProps['onChange'] = (value) => {
@@ -130,19 +127,21 @@ const CreateBook = (props: IProps) => {
         const { onSuccess } = options;
         const file = options.file as FileType;
         const res = await uploadFileAPI(file, 'book');
+        console.log('Upload response:', res);
         if(res && res.data){
             message.success('Upload file successfully');
-                const uploadedFile: any = {
-                    uid: file.uid,
-                    name: res.data.fileUploaded,
-                    status: 'done',
-                    url: `${import.meta.env.VITE_BACKEND_URL}/images/book/${res.data.fileUploaded}`
-                };
-                if(type === "thumbnail"){
-                    setFileListThumbnail([{...uploadedFile}]);
-                }else{
-                    setFileListSliders((prev) => [...prev, {...uploadedFile}]);
-                }
+            const uploadedFile: any = {
+                uid: file.uid,
+                name: res.data.fileUploaded,
+                status: 'done',
+                url: `${import.meta.env.VITE_BACKEND_URL}/images/book/${res.data.fileUploaded}`
+            };
+            if(type === "thumbnail"){
+                setFileListThumbnail([{...uploadedFile}]);
+            }else{
+                setFileListSliders((prev) => [...prev, {...uploadedFile}]);
+            }
+                console.log('Uploaded file from API:', uploadedFile);
             };
         if(onSuccess){
             onSuccess("ok");
@@ -152,11 +151,35 @@ const CreateBook = (props: IProps) => {
     }
 
 
+
     const onFinish : FormProps<FieldType>['onFinish'] = async (values) => {
         message.success('Create book successfully');
         setIsSubmit(true);
         console.log('Success:', values);
+        console.log('Thumbnail:', fileListThumbnail);
+        console.log('Sliders:', fileListSliders);
+
+        const { mainText, author, price, category, quantity } = values;
+        const thumbnail = fileListThumbnail?.[0]?.name ?? '';
+        const slider = fileListSliders.map(item => item.name) ?? [];
+        const res = await createBookAPI(mainText, author, price, quantity, category, thumbnail, slider);
+        if(res.data){
+            message.success('Create book successfully');
+        }else{
+           notification.error({
+                message: 'Create book failed',
+                description: res.message || 'Something went wrong, please try again later',
+                duration: 3
+           });
+        }
+        setIsSubmit(false);
+        refreshTable();
+        form.resetFields();
+        setFileListThumbnail([]);
+        setFileListSliders([]);
     };
+
+
 
 
 
@@ -267,7 +290,6 @@ const CreateBook = (props: IProps) => {
                                 listType="picture-card"
                                 fileList={fileListThumbnail}
                                 onPreview={handlePreview}
-                                onChange={handleChangeThumbnail}
                                 maxCount={1}
                                 beforeUpload={beforeUpload} // Prevent auto upload
                                 customRequest={(options) => handleUploadFile(options, "thumbnail")}
@@ -290,7 +312,6 @@ const CreateBook = (props: IProps) => {
                                 listType="picture-card"
                                 fileList={fileListSliders}
                                 onPreview={handlePreview}
-                                onChange={handleChangeSlider}
                                 maxCount={5}
                                 multiple={true}
                                 beforeUpload={beforeUpload} // Prevent auto upload
