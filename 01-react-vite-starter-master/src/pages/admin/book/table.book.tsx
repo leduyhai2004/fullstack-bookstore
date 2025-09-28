@@ -1,9 +1,9 @@
 import { CloudUploadOutlined, DeleteOutlined, EditOutlined, ExportOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Button, Space, Tag } from 'antd';
+import { Button, notification, Space, Tag } from 'antd';
 import { useRef, useState } from 'react';
-import { deleteUserAPI, getBookAPI, getUserAPI } from '../../../services/api';
+import { deleteBookAPI, deleteUserAPI, getBookAPI, getUserAPI } from '../../../services/api';
 import { dateRangeValidate } from '../../../services/helper';
 import DetailUser from '../user/detail.user';
 import CreateUser from '../user/create.user';
@@ -39,8 +39,8 @@ const TableBook = () => {
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
     const [dataViewDetail, setDataViewDetail] = useState<IBookTable | null>(null);
 
-    const [openUpdateUser, setOpenUpdateUser] = useState<boolean>(false);
-    const [dataUpdateUser, setDataUpdateUser] = useState<IBookTable | null>(null);
+    const [openUpdateBook, setOpenUpdateBook] = useState<boolean>(false);
+    const [dataUpdateBook, setDataUpdateBook] = useState<IBookTable | null>(null);
 
     const [openModelCreate, setOpenModelCreate] = useState<boolean>(false);
 
@@ -117,15 +117,19 @@ const TableBook = () => {
                         onClick={async () => {
                             console.log('delete', entity);
                             // Call delete API here
-                            await deleteUserAPI(entity._id);
+                            await deleteBookAPI(entity._id);
+                            notification.success({
+                                message: 'Delete Book',
+                                description: 'Delete book successfully',
+                            });
                             refreshTable();
                         }}
                     ></Button>
                     <Button
                         icon={<EditOutlined />}
                         onClick={() => {
-                            setDataUpdateUser(entity);
-                            setOpenUpdateUser(true);
+                            setDataUpdateBook(entity);
+                            setOpenUpdateBook(true);
                         }}
                     ></Button>
                 </Space>
@@ -137,6 +141,10 @@ const TableBook = () => {
     const refreshTable = () => {
         actionRef.current?.reload();
     }
+    function setDataUpdateUser(data: IBookTable | null): void {
+        throw new Error('Function not implemented.');
+    }
+
     return (
         <>
             <ProTable<IBookTable, TSearch>
@@ -246,13 +254,13 @@ const TableBook = () => {
                 refreshTable={refreshTable}
             />
 
-            {/* <UpdateBook
-                openUpdateUser={openUpdateUser}
-                setOpenUpdateUser={setOpenUpdateUser}
-                dataUpdateUser={dataUpdateUser}
-                setDataUpdateUser={setDataUpdateUser}
+            <UpdateBook
+                openUpdateBook={openUpdateBook}
+                setOpenUpdateBook={setOpenUpdateBook}
+                dataUpdateBook={dataUpdateBook}
+                setDataUpdateBook={setDataUpdateBook}
                 refreshTable={refreshTable}
-            /> */}
+            />
         </>
     );
 };
