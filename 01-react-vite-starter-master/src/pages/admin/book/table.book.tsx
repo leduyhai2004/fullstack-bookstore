@@ -229,7 +229,6 @@ const TableBook = () => {
                         >
                             Export
                         </CSVLink>
-                            
                     </Button>
 
                 ]}
@@ -241,11 +240,10 @@ const TableBook = () => {
                 setDataViewDetail={setDataViewDetail}
             />
 
-            {/* <CreateBook
+            <CreateBook
                 openModelCreate={openModelCreate}
                 setOpenModelCreate={setOpenModelCreate}
-                refreshTable={refreshTable}
-            /> */}
+            />
 
             {/* <UpdateBook
                 openUpdateUser={openUpdateUser}
