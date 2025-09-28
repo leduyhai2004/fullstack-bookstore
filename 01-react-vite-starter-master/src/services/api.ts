@@ -105,3 +105,7 @@ export const updateBookAPI = (
 export const deleteBookAPI = ( _id: string ) => {
     return axios.delete<IBackendRes<IRegister>>(`api/v1/book/${_id}`);
 }
+
+export const getBookDetailAPI = (_id: string) => {
+    return axios.get<IBackendRes<IBookTable>>(`api/v1/book/${_id}`);
+}

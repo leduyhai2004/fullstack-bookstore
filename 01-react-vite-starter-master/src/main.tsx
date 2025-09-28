@@ -33,6 +33,10 @@ const router = createBrowserRouter([
         element: <BookPage />,
       },
       {
+        path: "/book/:id",
+        element: <BookPage />,
+      },
+      {
         path: "/about",
         element: <AboutPage />,
       },
