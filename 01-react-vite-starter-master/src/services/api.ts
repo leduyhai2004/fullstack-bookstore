@@ -109,3 +109,18 @@ export const deleteBookAPI = ( _id: string ) => {
 export const getBookDetailAPI = (_id: string) => {
     return axios.get<IBackendRes<IBookTable>>(`api/v1/book/${_id}`);
 }
+
+export const placeOrderAPI = (data: {
+  name: string;
+  address: string;
+  phone: string;
+  type: string;
+  totalPrice: number;
+  detail: {
+    bookName: string;
+    quantity: number;
+    _id: string;
+  }[];
+}) => {
+  return axios.post<IBackendRes<any>>('api/v1/order', data);
+};

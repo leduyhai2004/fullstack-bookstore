@@ -19,7 +19,7 @@ import {
   BookOutlined,
   ArrowLeftOutlined
 } from '@ant-design/icons';
-import './bookDetail.scss';
+import '../../styles/bookDetail.scss';
 import { useCurrentApp } from '../../components/context/app.context';
 
 // Dynamic book description generator for premium feel

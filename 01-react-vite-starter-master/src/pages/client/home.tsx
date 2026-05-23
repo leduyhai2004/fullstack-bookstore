@@ -22,7 +22,7 @@ import {
   MenuOutlined,
   StarFilled
 } from '@ant-design/icons';
-import './home.scss';
+import '../../styles/home.scss';
 import { getBookAPI, getCategoryAPI } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
