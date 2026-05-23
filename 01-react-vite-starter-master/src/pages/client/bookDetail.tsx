@@ -20,6 +20,7 @@ import {
   ArrowLeftOutlined
 } from '@ant-design/icons';
 import './bookDetail.scss';
+import { useCurrentApp } from '../../components/context/app.context';
 
 // Dynamic book description generator for premium feel
 const getMockSynopsis = (title: string, category: string, author: string) => {
@@ -49,12 +50,13 @@ const BookDetailPage = () => {
   const navigate = useNavigate();
   const [book, setBook] = useState<IBookTable | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   // Gallery Active Image
   const [activeImage, setActiveImage] = useState<string>('');
 
   // Selected Purchase Quantity
   const [selectedQty, setSelectedQty] = useState<number>(1);
+
+  const {cart, setCart} = useCurrentApp();
 
   useEffect(() => {
     const fetchBookDetail = async () => {
@@ -144,6 +146,40 @@ const BookDetailPage = () => {
   // CTA triggers
   const handleAddToCart = () => {
     if (!book) return;
+    const cartData = localStorage.getItem("cart") || '[]';
+    if(cartData && book){
+      // update
+      const carts = JSON.parse(cartData) as ICart[];
+
+      // check exist
+      let isExistBook = carts.find(c => c._id == book?._id);
+      if(isExistBook){
+        // update quantity
+        isExistBook.quantity += selectedQty;
+      }else{
+        // add new book
+        carts.push({
+          _id: book._id,
+          quantity: selectedQty,
+          detail: book
+        });
+      }
+      localStorage.setItem('cart', JSON.stringify(carts));
+      // sync React Context
+      setCart(carts)
+    }else{
+      // create
+      const data:ICart[] = [
+        {
+          _id: book._id,
+          quantity: selectedQty,
+          detail: book
+        }
+      ]
+      localStorage.setItem('cart', JSON.stringify(data));
+      // sync React Context
+      setCart(data)
+    }
     message.success(`Đã thêm thành công ${selectedQty} cuốn "${book.mainText}" vào giỏ hàng!`);
   };
 

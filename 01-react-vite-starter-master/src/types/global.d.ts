@@ -94,4 +94,10 @@ interface IBookTable{
         updatedAt : Date;   
         __v: number;
 }
+
+interface ICart {
+    _id : String
+    quantity : number
+    detail : IBookTable
+}
 }

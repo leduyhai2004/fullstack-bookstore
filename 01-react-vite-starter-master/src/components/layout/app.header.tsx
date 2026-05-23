@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { FaReact } from 'react-icons/fa'
 import { FiShoppingCart } from 'react-icons/fi';
 import { VscSearchFuzzy } from 'react-icons/vsc';
-import { Divider, Badge, Drawer, Avatar, Popover } from 'antd';
+import { Divider, Badge, Drawer, Avatar, Popover, Empty } from 'antd';
 import { Dropdown, Space } from 'antd';
 import { useNavigate } from 'react-router';
 import './app.header.scss';
@@ -14,7 +14,7 @@ import { logoutAPI } from '../../services/api';
 const AppHeader = (props: any) => {
     const [openDrawer, setOpenDrawer] = useState(false);
 
-    const { isAuthenticated, user ,setUser, setIsAuthenticated} = useCurrentApp();
+    const { isAuthenticated, user ,setUser, setIsAuthenticated, cart} = useCurrentApp();
 
     const navigate = useNavigate();
 
@@ -64,8 +64,8 @@ const AppHeader = (props: any) => {
     const contentPopover = () => {
         return (
             <div className='pop-cart-body'>
-                {/* <div className='pop-cart-content'>
-                    {carts?.map((book, index) => {
+                <div className='pop-cart-content'>
+                    {cart?.map((book, index) => {
                         return (
                             <div className='book' key={`book-${index}`}>
                                 <img src={`${import.meta.env.VITE_BACKEND_URL}/images/book/${book?.detail?.thumbnail}`} />
@@ -77,7 +77,7 @@ const AppHeader = (props: any) => {
                         )
                     })}
                 </div>
-                {carts.length > 0 ?
+                {cart.length > 0 ?
                     <div className='pop-cart-footer'>
                         <button onClick={() => navigate('/order')}>Xem giỏ hàng</button>
                     </div>
@@ -85,7 +85,7 @@ const AppHeader = (props: any) => {
                     <Empty
                         description="Không có sản phẩm trong giỏ hàng"
                     />
-                } */}
+                }
             </div>
         )
     }
@@ -123,8 +123,7 @@ const AppHeader = (props: any) => {
                                     content={contentPopover}
                                     arrow={true}>
                                     <Badge
-                                        // count={carts?.length ?? 0}
-                                        count={10}
+                                        count={cart?.length ?? 0}
                                         size={"small"}
                                         showZero
                                     >
