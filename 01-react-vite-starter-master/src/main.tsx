@@ -7,7 +7,6 @@ import {
 import { App, ConfigProvider } from 'antd';
 import Layout from './layout';
 import HomePage from './pages/client/home';
-import BookPage from './pages/client/book';
 import AboutPage from './pages/client/about';
 import ProtectedRoute from './components/auth';
 import LayoutAdmin from './components/layout/layout.admin';
@@ -30,10 +29,6 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />
-      },
-      {
-        path: "/book",
-        element: <BookPage />,
       },
       {
         path: "/book/:id",
