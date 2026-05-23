@@ -1,7 +1,9 @@
+import TableOrder from "./order/table.order";
+
 const ManageOrderPage = () => {
     return (
         <div>
-            ManageOrderPage
+            <TableOrder />
         </div>
     )
 }

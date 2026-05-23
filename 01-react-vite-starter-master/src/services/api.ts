@@ -113,7 +113,7 @@ export const deleteBookAPI = ( _id: string ) => {
 export const getBookDetailAPI = (_id: string) => {
     return axios.get<IBackendRes<IBookTable>>(`api/v1/book/${_id}`);
 }
-
+// orders
 export const placeOrderAPI = (data: {
   name: string;
   address: string;
@@ -132,4 +132,8 @@ export const placeOrderAPI = (data: {
 
 export const getOrderHistoryAPI = () => {
     return axios.get<IBackendRes<IOrderHistory>>(`api/v1/history`);
+}
+
+export const getOrderAPI = (query: string) => {
+    return axios.get<IBackendRes<IModelPaginate<IOrderHistory>>>(`api/v1/order?${query}`);
 }
