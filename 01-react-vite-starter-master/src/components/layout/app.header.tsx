@@ -100,17 +100,21 @@ const AppHeader = () => {
                             setOpenDrawer(true)
                         }}>☰</div>
                         <div className='page-header__logo'>
-                            <span className='logo'>
-                                <span onClick={() => navigate('/')}> <FaReact className='rotate icon-react' /></span>
-
-                                <VscSearchFuzzy className='icon-search' />
+                            <span className='logo' onClick={() => navigate('/')}>
+                                <FaReact className='rotate icon-react' />
+                                <span className='brand-text'>
+                                    Vite<span className='brand-accent'>Book</span>
+                                </span>
                             </span>
-                            <input
-                                className="input-search" type={'text'}
-                                placeholder="Bạn tìm gì hôm nay"
-                            // value={props.searchTerm}
-                            // onChange={(e) => props.setSearchTerm(e.target.value)}
-                            />
+                            
+                            <div className="search-bar-wrapper">
+                                <VscSearchFuzzy className='icon-search' />
+                                <input
+                                    className="input-search" 
+                                    type={'text'}
+                                    placeholder="Bạn tìm gì hôm nay..."
+                                />
+                            </div>
                         </div>
 
                     </div>
@@ -136,12 +140,12 @@ const AppHeader = () => {
                             <li className="navigation__item mobile"><Divider type='vertical' /></li>
                             <li className="navigation__item mobile">
                                 {!isAuthenticated ?
-                                    <span onClick={() => navigate('/login')}> Tài Khoản</span>
+                                    <span className="header-login-btn" onClick={() => navigate('/login')}>Đăng Nhập</span>
                                     :
-                                    <Dropdown menu={{ items }} trigger={['click']}>
-                                        <Space >
-                                            <Avatar src={urlAvatar} />
-                                            {user?.fullName}
+                                    <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
+                                        <Space className="user-profile-capsule">
+                                            <Avatar src={urlAvatar} className="header-avatar" />
+                                            <span className="user-name">{user?.fullName}</span>
                                         </Space>
                                     </Dropdown>
                                 }
