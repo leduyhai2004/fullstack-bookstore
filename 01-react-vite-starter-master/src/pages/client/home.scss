@@ -1,0 +1,527 @@
+/* Home Page Stylesheet - Premium E-Commerce Experience */
+
+.homepage-container {
+  min-height: calc(100vh - 64px);
+  background-color: #f5f5fa;
+  padding: 24px 16px;
+  display: flex;
+  justify-content: center;
+
+  .homepage-inner-layout {
+    max-width: 1440px;
+    width: 100%;
+    background: transparent !important;
+    gap: 20px;
+  }
+
+  // 1. Layout structure
+  .homepage-sider {
+    background: #ffffff !important;
+    border-radius: 8px;
+    padding: 20px 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+    position: sticky;
+    top: 24px;
+    transition: all 0.3s ease;
+  }
+
+  .homepage-main-layout {
+    background: transparent !important;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .homepage-content-header {
+    background: #ffffff !important;
+    border-radius: 8px;
+    padding: 16px 24px;
+    height: auto !important;
+    line-height: normal !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+
+      h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+    }
+  }
+
+  .homepage-content {
+    background: transparent !important;
+  }
+
+  // 2. Sidebar Filters
+  .filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .filter-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #333333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-reset-all {
+      font-size: 0.85rem;
+      color: #1677ff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s ease;
+      background: none;
+      border: none;
+      padding: 0;
+
+      &:hover {
+        color: #4096ff;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .filter-section {
+    margin-bottom: 24px;
+
+    h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #262626;
+      margin-bottom: 12px;
+      text-transform: capitalize;
+    }
+
+    // Category check list
+    .category-checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding-right: 4px;
+
+      /* Custom scrollbar */
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+      }
+
+      .ant-checkbox-wrapper {
+        margin-inline-start: 0 !important;
+        font-size: 0.9rem;
+        color: #595959;
+
+        &:hover {
+          color: #1a1a1a;
+        }
+      }
+    }
+
+    // Price range fields
+    .price-range-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .price-inputs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .ant-input {
+          text-align: center;
+          border-radius: 4px;
+          border-color: #d9d9d9;
+          font-size: 0.85rem;
+
+          &:focus {
+            border-color: #4096ff;
+            box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+          }
+        }
+
+        span {
+          color: #bfbfbf;
+          font-size: 0.85rem;
+        }
+      }
+
+      .btn-apply-price {
+        width: 100%;
+        border-radius: 4px;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(22, 119, 255, 0.15);
+      }
+    }
+
+    // Ratings list
+    .rating-filter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .rating-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+
+        .ant-rate {
+          font-size: 0.85rem;
+        }
+
+        .rating-label {
+          font-size: 0.85rem;
+          color: #595959;
+          transition: color 0.2s ease;
+        }
+
+        &:hover {
+          background-color: #f5f5f5;
+          
+          .rating-label {
+            color: #1a1a1a;
+          }
+        }
+
+        &.active {
+          background-color: #e6f4ff;
+          
+          .rating-label {
+            color: #1677ff;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  // 3. Sorting Toolbar & Active Tags
+  .sorting-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .sort-label {
+      font-size: 0.9rem;
+      color: #595959;
+      margin-right: 12px;
+    }
+
+    .ant-radio-group {
+      .ant-radio-button-wrapper {
+        border-radius: 4px;
+        margin-right: 8px;
+        border: 1px solid #d9d9d9;
+        font-size: 0.9rem;
+        color: #595959;
+        transition: all 0.2s ease;
+
+        &::before {
+          display: none !important;
+        }
+
+        &:first-child {
+          border-radius: 4px !important;
+        }
+        &:last-child {
+          border-radius: 4px !important;
+          margin-right: 0;
+        }
+
+        &:hover {
+          color: #1677ff;
+          border-color: #1677ff;
+        }
+
+        &-checked:not(.ant-radio-button-wrapper-disabled) {
+          background-color: #1677ff !important;
+          border-color: #1677ff !important;
+          color: #ffffff !important;
+          box-shadow: 0 2px 4px rgba(22, 119, 255, 0.2);
+
+          &:hover {
+            color: #ffffff;
+          }
+        }
+      }
+    }
+  }
+
+  .active-tags-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 4px;
+    border-top: 1px dashed #f0f0f0;
+
+    .tags-label {
+      font-size: 0.85rem;
+      color: #8c8c8c;
+    }
+
+    .ant-tag {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #d9d9d9;
+      background: #fafafa;
+      color: #595959;
+      margin: 0;
+
+      .anticon {
+        cursor: pointer;
+        font-size: 0.75rem;
+        color: #bfbfbf;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: #ff4d4f;
+        }
+      }
+    }
+  }
+
+  // 4. Product Card Styling (Premium Aesthetics)
+  .product-card {
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ebebeb;
+    background: #ffffff;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      border-color: #1677ff50;
+
+      .card-image-wrapper img {
+        transform: scale(1.05);
+      }
+    }
+
+    .card-image-wrapper {
+      width: 100%;
+      padding-top: 110%; // Keep standard image aspect ratio
+      position: relative;
+      background: #f7f7f7;
+      overflow: hidden;
+
+      img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+      }
+
+      // Elegant dynamic fallback cover if thumbnail doesn't exist
+      .book-placeholder-cover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 16px;
+        color: #ffffff;
+        font-family: 'Outfit', sans-serif;
+        box-sizing: border-box;
+
+        .placeholder-logo {
+          font-weight: 800;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          opacity: 0.85;
+        }
+
+        .placeholder-title {
+          font-size: 0.95rem;
+          font-weight: 700;
+          line-height: 1.3;
+          margin-top: auto;
+          margin-bottom: 8px;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .placeholder-author {
+          font-size: 0.75rem;
+          opacity: 0.9;
+          font-weight: 500;
+          text-transform: uppercase;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+      }
+    }
+
+    .card-info-wrapper {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      gap: 8px;
+
+      .product-title {
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: #333333;
+        line-height: 1.4;
+        margin: 0;
+        height: 2.8em; // Allow exactly 2 lines
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: #1677ff;
+        }
+      }
+
+      .product-pricing {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        margin-top: auto;
+
+        .price-current {
+          font-size: 1.05rem;
+          font-weight: 700;
+          color: #ff424e; // Vietnamese retail discount red
+        }
+
+        .price-original {
+          font-size: 0.8rem;
+          color: #888888;
+          text-decoration: line-through;
+        }
+      }
+
+      .product-rating-sold {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #787878;
+        border-top: 1px solid #f5f5f5;
+        padding-top: 8px;
+
+        .ant-rate {
+          font-size: 0.7rem;
+
+          .ant-rate-star {
+            margin-inline-end: 2px !important;
+          }
+        }
+
+        .sold-counter {
+          font-weight: 500;
+          background: #f5f5fa;
+          padding: 2px 6px;
+          border-radius: 4px;
+          color: #595959;
+        }
+      }
+    }
+  }
+
+  // 5. Pagination
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+    margin-bottom: 16px;
+
+    .ant-pagination {
+      background: #ffffff;
+      padding: 10px 24px;
+      border-radius: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border: 1px solid #f0f0f0;
+    }
+  }
+}
+
+// 6. Responsive behavior / drawer toggles for Sider
+@media (max-width: 991px) {
+  .homepage-container {
+    padding: 16px 8px;
+
+    .homepage-sider {
+      display: none !important;
+    }
+
+    .mobile-filter-btn {
+      display: inline-flex !important;
+      align-items: center;
+      gap: 6px;
+      border-radius: 4px;
+      font-weight: 500;
+      border-color: #d9d9d9;
+      
+      &:hover, &:focus {
+        color: #1677ff;
+        border-color: #1677ff;
+      }
+    }
+  }
+}
+
+.mobile-filter-drawer {
+  .ant-drawer-body {
+    padding: 20px;
+    background-color: #ffffff;
+  }
+}

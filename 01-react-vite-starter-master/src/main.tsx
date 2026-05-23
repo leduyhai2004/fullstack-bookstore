@@ -19,6 +19,7 @@ import LoginPage from './pages/client/auth/login';
 import RegisterPage from './pages/client/auth/register';
 import { AppProvider } from './components/context/app.context';
 import enUS  from  "antd/locale/en_US";
+import BookDetailPage from './pages/client/bookDetail';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -34,7 +35,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/book/:id",
-        element: <BookPage />,
+        element: <BookDetailPage />,
       },
       {
         path: "/about",

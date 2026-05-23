@@ -1,401 +1,486 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Layout,
   Row,
   Col,
-  Card,
   Rate,
-  Slider,
   Checkbox,
   Button,
-  Typography,
   Input,
-  Tabs,
-  Space,
+  Radio,
   Divider,
-  Pagination
+  Pagination,
+  Tag,
+  Breadcrumb,
+  Drawer,
+  Spin
 } from 'antd';
 import {
-  FilterOutlined
+  FilterOutlined,
+  ReloadOutlined,
+  BookOutlined,
+  MenuOutlined,
+  StarFilled
 } from '@ant-design/icons';
-import { getCategoryAPI, getBookAPI } from '../../services/api';
+import './home.scss';
+import { getBookAPI, getCategoryAPI } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const { Header, Sider, Content } = Layout;
-const { Title, Text } = Typography;
 
-const HomePage =  () => {
-  const navigate = useNavigate();
-  const [priceRange, setPriceRange] = useState([0, 5000000]);
+const HomePage = () => {
+  // 1. Sidebar Filters States
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [books, setBooks] = useState<IBookTable[]>([]);
-  const [meta, setMeta] = useState({
-    current: 1,
-    pageSize: 12,
-    pages: 0,
-    total: 0
-  });
-  const [loading, setLoading] = useState(false);
-  const [sortBy, setSortBy] = useState('sold'); // Default sort by sold (popular)
+  const [priceFrom, setPriceFrom] = useState<number>(0);
+  const [priceTo, setPriceTo] = useState<number>(0);
+  const [tempPriceFrom, setTempPriceFrom] = useState<number>(0);
+  const [tempPriceTo, setTempPriceTo] = useState<number>(0);
+  const [selectedRating, setSelectedRating] = useState<number | null>(null);
 
+  // 2. Sorting & Pagination States
+  const [sortKey, setSortKey] = useState<string>('Phổ biến');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(8);
 
-  const getCategory = async () => {
-    const res = await getCategoryAPI();
-    if (res?.data) {
-      setCategories(res.data);
-    }
-  }
+  const [listCategory, setListCategory] = useState<{label: string, value: string}[]>([]);
+  const [listBook, setListBook] = useState<IBookTable[]>([]);
+  const [total, setTotal] = useState<number>(0);
+  const [filter, setFilter] = useState<string>("");
+  const [sortQuery, setSortQuery] = useState<string>("sort=-sold");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  const getBooks = async (page: number = currentPage, size: number = pageSize, sort: string = sortBy) => {
-    setLoading(true);
-    try {
-      let query = `current=${page}&pageSize=${size}`;
-      
-      // Add category filter
-      if (selectedCategories.length > 0) {
-        const categoryQuery = selectedCategories.map(cat => `category=${cat}`).join('&');
-        query += `&${categoryQuery}`;
-      }
-      
-      // Add price range filter
-      if (priceRange[0] > 0 || priceRange[1] < 2000000) {
-        query += `&price>=${priceRange[0]}&price<=${priceRange[1]}`;
-      }
-      
-      // Add sorting
-      if (sort) {
-        switch (sort) {
-          case 'sold':
-            query += `&sort=-sold`; // Popular: sort by sold descending
-            break;
-          case 'updatedAt':
-            query += `&sort=-updatedAt`; // New: sort by updatedAt descending
-            break;
-          case 'price-asc':
-            query += `&sort=price`; // Price low to high
-            break;
-          case 'price-desc':
-            query += `&sort=-price`; // Price high to low
-            break;
-          default:
-            query += `&sort=-sold`; // Default to popular
+  useEffect(() => {
+    const initCategory = async () => {
+        const res = await getCategoryAPI();
+
+        if (res && res.data) {
+            const d = res.data.map(item => {
+                return {
+                    label: item,
+                    value: item
+                };
+            });
+
+            setListCategory(d);
         }
-      }
+    };
 
-      const res = await getBookAPI(query);
-      if (res?.data) {
-        setBooks(res.data.result);
-        setMeta(res.data.meta);
-      }
-    } catch (error) {
-      console.error('Error fetching books:', error);
-      setBooks([]);
-    } finally {
-      setLoading(false);
+    initCategory();
+}, []);
+
+  useEffect(() => {
+    let queryParts = [];
+    if (selectedCategories.length > 0) {
+      // Encode values for safety
+      queryParts.push(`category=${selectedCategories.map(c => encodeURIComponent(c)).join(',')}`);
     }
-  }
+    if (priceFrom) {
+      queryParts.push(`price>=${priceFrom}`);
+    }
+    if (priceTo) {
+      queryParts.push(`price<=${priceTo}`);
+    }
+    setFilter(queryParts.join('&'));
+  }, [selectedCategories, priceFrom, priceTo]);
 
   useEffect(() => {
-    getCategory();
-  }, []);
+    if (sortKey === 'Hàng Mới') {
+      setSortQuery('sort=-createdAt');
+    } else if (sortKey === 'Giá Thấp Đến Cao') {
+      setSortQuery('sort=price');
+    } else if (sortKey === 'Giá Cao Đến Thấp') {
+      setSortQuery('sort=-price');
+    } else {
+      setSortQuery('sort=-sold');
+    }
+  }, [sortKey]);
 
   useEffect(() => {
-    getBooks();
-  }, [currentPage, pageSize, selectedCategories, priceRange, sortBy]);
+    fetchBook();
+  }, [currentPage, pageSize, filter, sortQuery]);
 
-  // Apply price range filter
-  const handleApplyPriceFilter = () => {
-    setCurrentPage(1); // Reset to first page when applying filter
-    getBooks(1, pageSize);
+  const fetchBook = async () => {
+    setIsLoading(true);
+
+    let query = `current=${currentPage}&pageSize=${pageSize}`;
+
+    if (filter) {
+        query += `&${filter}`;
+    }
+
+    if (sortQuery) {
+        query += `&${sortQuery}`;
+    }
+
+    const res = await getBookAPI(query);
+
+    if (res && res.data) {
+        setListBook(res.data.result);
+        setTotal(res.data.meta.total);
+    }
+
+    setIsLoading(false);
+};
+
+  // Mobile Drawer Toggle
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState<boolean>(false);
+
+  // 3. Clear/Reset All Filters
+  const handleResetFilters = () => {
+    setSelectedCategories([]);
+    setPriceFrom(0);
+    setPriceTo(0);
+    setTempPriceFrom(0);
+    setTempPriceTo(0);
+    setSelectedRating(null);
+    setCurrentPage(1);
   };
 
-  // Handle category selection
-  const handleCategoryChange = (checkedValues: string[]) => {
+  // Format Helper for Currency
+  const formatVND = (value: number) => {
+    return new Intl.NumberFormat('vi-VN').format(value) + ' đ';
+  };
+
+  // Format Helper for Sales Counter
+  const formatSold = (soldCount: number) => {
+    if (soldCount >= 1000) {
+      return `Đã bán ${(soldCount / 1000).toFixed(1).replace('.0', '')}k`;
+    }
+    return `Đã bán ${soldCount}`;
+  };
+
+  // Handle price application
+  const handleApplyPrice = () => {
+    setPriceFrom(tempPriceFrom);
+    setPriceTo(tempPriceTo);
+    setCurrentPage(1);
+  };
+
+  // Checkbox handlers
+  const handleCategoryChange = (checkedValues: any[]) => {
     setSelectedCategories(checkedValues);
-    setCurrentPage(1); // Reset to first page when changing category
+    setCurrentPage(1);
   };
 
-  // Handle tab change for sorting
-  const handleTabChange = (key: string) => {
-    setSortBy(key);
-    setCurrentPage(1); // Reset to first page when changing sort
-  };
-  
+  // 4. Client Side Logical Filtering & Sorting of Mock Data
 
+  // Paginated List (already paginated by backend API)
+  const paginatedBooks = listBook;
 
-  
-  const formatPrice = (price : any) => {
-    return new Intl.NumberFormat('vi-VN').format(price) + ' đ';
+  // Handle active tag removes
+  const handleRemoveCategoryTag = (cat: string) => {
+    setSelectedCategories(prev => prev.filter(c => c !== cat));
   };
 
-  // Xử lý thay đổi trang
-  const handlePageChange = (page: number, size?: number) => {
-    setCurrentPage(page);
-    if (size && size !== pageSize) {
-      setPageSize(size);
-      setCurrentPage(1); // Reset to first page when changing page size
-    }
-    // Scroll to top khi chuyển trang
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleRemoveRatingTag = () => {
+    setSelectedRating(null);
   };
 
-  const BookCard = ({ book }: { book: IBookTable }) => (
-    <Card
-      hoverable
-      className="book-card"
-      onClick={() => navigate(`/book/${book._id}`)}
-      cover={
-        <div className="book-image-container">
-          {book.thumbnail ? (
-            <img
-              src={`${import.meta.env.VITE_BACKEND_URL}/images/book/${book.thumbnail}`}
-              alt={book.mainText}
-              style={{
-                width: '100%',
-                height: 280,
-                objectFit: 'cover'
-              }}
-              onError={(e) => {
-                // Fallback to gradient background if image fails to load
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const parent = target.parentElement;
-                if (parent) {
-                  parent.innerHTML = `
-                    <div style="
-                      width: 100%;
-                      height: 280px;
-                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      color: white;
-                      font-size: 48px;
-                      font-weight: bold;
-                    ">📚</div>
-                  `;
-                }
-              }}
+  const handleRemovePriceTag = () => {
+    setPriceFrom(0);
+    setPriceTo(0);
+    setTempPriceFrom(0);
+    setTempPriceTo(0);
+  };
+
+  const hasActiveFilters =
+    selectedCategories.length > 0 ||
+    priceFrom > 0 ||
+    priceTo > 0 ||
+    selectedRating !== null;
+
+  // Sidebar Filter Content helper (Avoids component unmounting / focus loss)
+  const renderFilterContent = () => (
+    <div className="filter-inner-wrapper">
+      <div className="filter-header">
+        <span className="filter-title">
+          <FilterOutlined /> Bộ lọc tìm kiếm
+        </span>
+        {hasActiveFilters && (
+          <button className="btn-reset-all" onClick={handleResetFilters}>
+            <ReloadOutlined /> Xóa tất cả
+          </button>
+        )}
+      </div>
+
+      <Divider style={{ margin: '12px 0' }} />
+
+      {/* 1. Category Filter Section */}
+      <div className="filter-section">
+        <h4>Danh Mục Sách</h4>
+        <Checkbox.Group
+          value={selectedCategories}
+          onChange={handleCategoryChange}
+          className="category-checkbox-group"
+        >
+          {listCategory.map(category => (
+            <Checkbox key={category.value} value={category.value}>
+              {category.label}
+            </Checkbox>
+          ))}
+        </Checkbox.Group>
+      </div>
+
+      <Divider style={{ margin: '12px 0' }} />
+
+      {/* 3. Price Filter Section */}
+      <div className="filter-section">
+        <h4>Khoảng Giá</h4>
+        <div className="price-range-container">
+          <div className="price-inputs">
+            <Input
+              placeholder="đ TỪ"
+              value={tempPriceFrom}
+              onChange={e => setTempPriceFrom(Number(e.target.value.replace(/[^0-9]/g, '')))}
             />
-          ) : (
-            <div
-              style={{
-                width: '100%',
-                height: 280,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: '48px',
-                fontWeight: 'bold'
-              }}
-            >
-              📚
-            </div>
-          )}
-        </div>
-      }
-      style={{ marginBottom: 16 }}
-    >
-      <div className="book-info">
-        <Title level={5} className="book-title" style={{ 
-          fontSize: '14px', 
-          lineHeight: '1.4',
-          marginBottom: '8px',
-          height: '56px',
-          overflow: 'hidden',
-          display: '-webkit-box',
-          WebkitLineClamp: 3,
-          WebkitBoxOrient: 'vertical'
-        }}>
-          {book.mainText}
-        </Title>
-        
-        <Text style={{ 
-          fontSize: '12px', 
-          color: '#8c8c8c',
-          display: 'block',
-          marginBottom: '4px'
-        }}>
-          {book.author}
-        </Text>
-        
-        <Text className="book-price" style={{ 
-          fontSize: '16px', 
-          fontWeight: 'bold', 
-          color: '#ff4d4f',
-          display: 'block',
-          marginBottom: '8px'
-        }}>
-          {formatPrice(book.price)}
-        </Text>
-        
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Rate disabled defaultValue={4} style={{ fontSize: '12px' }} />
-          <Text style={{ fontSize: '12px', color: '#8c8c8c' }}>Số lượng: {book.quantity}</Text>
+            <span>-</span>
+            <Input
+              placeholder="đ ĐẾN"
+              value={tempPriceTo}
+              onChange={e => setTempPriceTo(Number(e.target.value.replace(/[^0-9]/g, '')))}
+            />
+          </div>
+          <Button type="primary" className="btn-apply-price" onClick={handleApplyPrice}>
+            Áp dụng
+          </Button>
         </div>
       </div>
-    </Card>
+
+      <Divider style={{ margin: '12px 0' }} />
+
+      {/* 4. Rating Filter Section */}
+      <div className="filter-section">
+        <h4>Đánh Giá</h4>
+        <div className="rating-filter-list">
+          {[5, 4, 3, 2, 1].map(stars => (
+            <div
+              key={stars}
+              className={`rating-row ${selectedRating === stars ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedRating(prev => (prev === stars ? null : stars));
+                setCurrentPage(1);
+              }}
+            >
+              <Rate disabled defaultValue={stars} />
+              <span className="rating-label">{stars !== 5 ? 'trở lên' : ''}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 
+  const handleClickBook = (book: IBookTable) => {
+    navigate(`/book/${book._id}`);
+  };
+
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f5f5f5' }}>
-      <Layout>
-        {/* Sidebar */}
-        <Sider 
-          width={280} 
-          style={{ 
-            background: '#fff', 
-            padding: '24px',
-            borderRight: '1px solid #f0f0f0'
-          }}
+    <div className="homepage-container">
+      <Layout className="homepage-inner-layout">
+        
+        {/* Responsive Sider: Collapses on Breakpoint lg (992px) */}
+        <Sider
+          width={280}
+          breakpoint="lg"
+          collapsedWidth="0"
+          trigger={null}
+          className="homepage-sider"
         >
-          <div style={{ marginBottom: 24 }}>
-            <Title level={5} style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-              <FilterOutlined style={{ marginRight: 8 }} />
-              Bộ lọc tìm kiếm
-            </Title>
-            <Text style={{ color: '#8c8c8c' }}>Danh mục sản phẩm</Text>
-          </div>
-
-          {/* Categories */}
-          <div style={{ marginBottom: 32 }}>
-            <Checkbox.Group 
-              value={selectedCategories}
-              onChange={handleCategoryChange}
-              style={{ width: '100%' }}
-            >
-              <Space direction="vertical" style={{ width: '100%' }}>
-                {categories.map(category => (
-                  <Checkbox key={category} value={category}>
-                    {category}
-                  </Checkbox>
-                ))}
-              </Space>
-            </Checkbox.Group>
-          </div>
-
-          {/* Price Range */}
-          <div style={{ marginBottom: 32 }}>
-            <Title level={5} style={{ marginBottom: 16 }}>Khoảng giá</Title>
-            <div style={{ display: 'flex', marginBottom: 16 }}>
-              <Input 
-                value={priceRange[0].toLocaleString()}
-                style={{ marginRight: 8 }}
-                readOnly
-              />
-              <Text style={{ margin: '0 8px', alignSelf: 'center' }}>-</Text>
-              <Input 
-                value={priceRange[1].toLocaleString()}
-                style={{ marginLeft: 8 }}
-                readOnly
-              />
-            </div>
-            <Slider
-              range
-              min={0}
-              max={20000000}
-              step={10000}
-              value={priceRange}
-              onChange={setPriceRange}
-              style={{ marginBottom: 16 }}
-            />
-            <Button type="primary" block onClick={handleApplyPriceFilter}>
-              Áp dụng
-            </Button>
-          </div>
-
-          {/* Rating Filter */}
-          <div>
-            <Title level={5} style={{ marginBottom: 16 }}>Đánh giá</Title>
-            <Space direction="vertical">
-              {[5, 4, 3, 2, 1].map(rating => (
-                <div key={rating} style={{ cursor: 'pointer' }}>
-                  <Rate disabled defaultValue={rating} style={{ fontSize: '14px' }} />
-                  <Text style={{ marginLeft: 8, color: '#8c8c8c' }}>trở lên</Text>
-                </div>
-              ))}
-            </Space>
-          </div>
+          {renderFilterContent()}
         </Sider>
 
-        {/* Main Content */}
-        <Content style={{ padding: '24px', background: '#f5f5f5' }}>
-          <Tabs 
-            defaultActiveKey="sold" 
-            size="large"
-            onChange={handleTabChange}
-            items={[
-              { key: 'sold', label: 'Phổ biến' },
-              { key: 'updatedAt', label: 'Hàng Mới' },
-              { key: 'price-asc', label: 'Giá Thấp Đến Cao' },
-              { key: 'price-desc', label: 'Giá Cao Đến Thấp' }
-            ]}
-          />
+        <Layout className="homepage-main-layout">
+          
+          {/* Main Layout Header (Sorting and Filters summary) */}
+          <Header className="homepage-content-header">
+            <div className="header-top">
+              <Breadcrumb
+                items={[
+                  { title: 'Trang chủ' },
+                  { title: 'Cửa hàng sách' }
+                ]}
+              />
+              <Button
+                className="mobile-filter-btn"
+                style={{ display: 'none' }} // Controlled by SCSS media queries but referenced for standard drawer toggles
+                icon={<MenuOutlined />}
+                onClick={() => setIsMobileDrawerOpen(true)}
+              >
+                Bộ lọc
+              </Button>
+            </div>
+            
+            {/* Sorting Tabs Toolbar */}
+            <div className="sorting-toolbar">
+              <div>
+                <span className="sort-label">Sắp xếp theo</span>
+                <Radio.Group
+                  value={sortKey}
+                  onChange={e => {
+                    setSortKey(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  optionType="button"
+                  buttonStyle="solid"
+                >
+                  <Radio.Button value="Phổ biến">Phổ biến</Radio.Button>
+                  <Radio.Button value="Hàng Mới">Hàng Mới</Radio.Button>
+                  <Radio.Button value="Giá Thấp Đến Cao">Giá Thấp Đến Cao</Radio.Button>
+                  <Radio.Button value="Giá Cao Đến Thấp">Giá Cao Đến Thấp</Radio.Button>
+                </Radio.Group>
+              </div>
+              <span style={{ fontSize: '0.85rem', color: '#8c8c8c' }}>
+                Tìm thấy <strong>{total}</strong> sản phẩm
+              </span>
+            </div>
 
-          <Divider style={{ margin: '16px 0' }} />
-
-          {/* Books Grid */}
-          <Row gutter={[16, 16]}>
-            {loading ? (
-              // Loading skeleton
-              Array.from({ length: pageSize }, (_, index) => (
-                <Col key={index} xs={24} sm={12} md={8} lg={6} xl={4}>
-                  <Card loading style={{ marginBottom: 16 }} />
-                </Col>
-              ))
-            ) : books.length > 0 ? (
-              books.map(book => (
-                <Col key={book._id} xs={24} sm={12} md={8} lg={6} xl={4}>
-                  <BookCard book={book} />
-                </Col>
-              ))
-            ) : (
-              <Col span={24}>
-                <div style={{ textAlign: 'center', padding: '40px', color: '#8c8c8c' }}>
-                  <Title level={4} style={{ color: '#8c8c8c' }}>Không tìm thấy sách nào</Title>
-                  <Text>Thử thay đổi bộ lọc để xem thêm sách khác</Text>
-                </div>
-              </Col>
+            {/* Active Tags ribbon to easily clear active filters */}
+            {hasActiveFilters && (
+              <div className="active-tags-container">
+                <span className="tags-label">Đang lọc: </span>
+                {selectedCategories.map(cat => (
+                  <Tag
+                    key={cat}
+                    closable
+                    onClose={() => handleRemoveCategoryTag(cat)}
+                  >
+                    Thể loại: {cat}
+                  </Tag>
+                ))}
+                {(priceFrom > 0 || priceTo > 0) && (
+                  <Tag closable onClose={handleRemovePriceTag}>
+                    Giá: {priceFrom ? formatVND(priceFrom) : '0đ'} - {priceTo ? formatVND(priceTo) : '∞'}
+                  </Tag>
+                )}
+                {selectedRating !== null && (
+                  <Tag closable onClose={handleRemoveRatingTag}>
+                    Đánh giá: {selectedRating} <StarFilled style={{ color: '#fadb14', fontSize: '0.8rem' }} /> trở lên
+                  </Tag>
+                )}
+              </div>
             )}
-          </Row>
+          </Header>
 
-          {/* Pagination */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center',
-            marginTop: '32px',
-            padding: '24px 0'
-          }}>
-            <Pagination
-              current={meta.current}
-              total={meta.total}
-              pageSize={meta.pageSize}
-              onChange={handlePageChange}
-              onShowSizeChange={handlePageChange}
-              showSizeChanger
-              showQuickJumper
-              showTotal={(total, range) => 
-                `${range[0]}-${range[1]} của ${total} sản phẩm`
-              }
-              pageSizeOptions={['12', '24', '36', '48']}
-              size="default"
-              style={{
-                background: 'white',
-                padding: '16px 24px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-              }}
-            />
-          </div>
-        </Content>
+          {/* Grid Layout of Cards */}
+          <Content className="homepage-content">
+            <Spin spinning={isLoading}>
+              {paginatedBooks.length > 0 ? (
+                <Row gutter={[16, 24]}>
+                  {paginatedBooks.map(book => (
+                    <Col key={book._id} xs={24} sm={12} md={8} lg={6}>
+                      <div
+                      onClick={()=> handleClickBook(book)}
+                       className="product-card"
+                       style={{ cursor: 'pointer' }}
+                       >
+                        {/* Product Image and high fidelity fallback cover */}
+                        <div className="card-image-wrapper">
+                          {book.thumbnail ? (
+                            <img
+                              src={`${import.meta.env.VITE_BACKEND_URL}/images/book/${book.thumbnail}`}
+                              alt={book.mainText}
+                            />
+                          ) : (
+                            <div
+                              className="book-placeholder-cover"
+                            >
+                              <span className="placeholder-logo">
+                                <BookOutlined /> BOOKSTORE
+                              </span>
+                              <span className="placeholder-title">
+                                {book.mainText}
+                              </span>
+                              <span className="placeholder-author">
+                                {book.author}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Info and pricing section */}
+                        <div className="card-info-wrapper">
+                          <h3 className="product-title" title={book.mainText}>
+                            {book.mainText}
+                          </h3>
+                          <div className="product-pricing">
+                            <span className="price-current">
+                              {formatVND(book.price)}
+                            </span>
+                            <span className="price-original">
+                              {formatVND(Math.round(book.price * 1.25))}
+                            </span>
+                          </div>
+
+                          <div className="product-rating-sold">
+                            <span className="sold-counter">
+                              {formatSold(book.sold)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                  ))}
+                </Row>
+              ) : (
+                <div
+                  style={{
+                    background: '#ffffff',
+                    borderRadius: '8px',
+                    padding: '48px',
+                    textAlign: 'center',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.05)'
+                  }}
+                >
+                  <div style={{ fontSize: '3rem', color: '#bfbfbf', marginBottom: '16px' }}>
+                    🔍
+                  </div>
+                  <h3 style={{ color: '#262626', margin: '0 0 8px 0' }}>
+                    Không tìm thấy sản phẩm phù hợp
+                  </h3>
+                  <p style={{ color: '#8c8c8c', margin: '0 0 24px 0', fontSize: '0.9rem' }}>
+                    Hãy thử thay đổi tiêu chí bộ lọc của bạn hoặc làm mới trang
+                  </p>
+                  <Button type="primary" onClick={handleResetFilters}>
+                    Làm mới bộ lọc
+                  </Button>
+                </div>
+              )}
+
+              {/* Pagination controls at the bottom */}
+              {listBook.length > 0 && (
+                <div className="pagination-container">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={total}
+                    onChange={(page, size) => {
+                      setCurrentPage(page);
+                      if (size) setPageSize(size);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    showSizeChanger
+                    pageSizeOptions={['4', '8', '12', '24']}
+                  />
+                </div>
+              )}
+            </Spin>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+
+      {/* Drawer for Mobile layout */}
+      <Drawer
+        title="Bộ lọc tìm kiếm"
+        placement="right"
+        onClose={() => setIsMobileDrawerOpen(false)}
+        open={isMobileDrawerOpen}
+        width={320}
+        rootClassName="mobile-filter-drawer"
+      >
+        {renderFilterContent()}
+      </Drawer>
+    </div>
   );
 };
 
