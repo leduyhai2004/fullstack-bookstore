@@ -21,6 +21,7 @@ import { AppProvider } from './components/context/app.context';
 import enUS  from  "antd/locale/en_US";
 import BookDetailPage from './pages/client/bookDetail';
 import OrderPage from './pages/client/cart';
+import HistoryPage from './pages/client/history';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -55,6 +56,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <OrderPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/history",
+        element: (
+          <ProtectedRoute>
+            <HistoryPage />
           </ProtectedRoute>
         ),
       }

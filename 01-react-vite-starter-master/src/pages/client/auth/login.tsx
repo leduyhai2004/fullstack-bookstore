@@ -32,7 +32,7 @@ const LoginPage = () => {
       setIsAuthenticated(true);
       localStorage.setItem('token', res.data.access_token);
       message.success('Login successful');
-      navigate('/home');
+      navigate('/');
     } else {
       message.error('Login failed');
     }

@@ -100,4 +100,26 @@ interface ICart {
     quantity : number
     detail : IBookTable
 }
+
+interface IOrderHistoryDetail {
+    bookName : string
+    quantity : number
+    _id : string
+}
+
+interface IOrderHistory {
+     _id: string,
+     name: string,
+     type: string,
+     email: string,
+     phone: string,
+     userId: string,
+     detail: IOrderHistoryDetail[],
+     totalPrice: number,
+     paymentStatus: string,
+     paymentRef: string,
+     createdAt: string,
+     updatedAt: string,
+     __v: number
+}
 }

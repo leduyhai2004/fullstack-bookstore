@@ -124,3 +124,8 @@ export const placeOrderAPI = (data: {
 }) => {
   return axios.post<IBackendRes<any>>('api/v1/order', data);
 };
+
+
+export const getOrderHistoryAPI = () => {
+    return axios.get<IBackendRes<IOrderHistory>>(`api/v1/history`);
+}

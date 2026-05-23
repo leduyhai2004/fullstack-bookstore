@@ -24,8 +24,8 @@ const CheckoutForm = ({
   onPlaceOrder,
   isSubmitting
 }: CheckoutFormProps) => {
-  const [name, setName] = useState<string>(userFullName || "I'm Admin");
-  const [phone, setPhone] = useState<string>(userPhone || "123456789");
+  const [name, setName] = useState<string>(userFullName);
+  const [phone, setPhone] = useState<string>(userPhone);
   const [address, setAddress] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<string>('COD');
 

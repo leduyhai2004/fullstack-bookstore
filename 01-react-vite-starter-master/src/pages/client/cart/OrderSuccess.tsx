@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'antd';
-import { CheckCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, ArrowLeftOutlined, HistoryOutlined } from '@ant-design/icons';
 
 const OrderSuccess = () => {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const OrderSuccess = () => {
         <p className="success-message">
           Cảm ơn quý khách đã mua sắm tại Bookstore. Đơn đặt hàng của quý khách đã được lưu và đang được tiến hành xử lý giao nhận.
         </p>
-        <div className="success-actions">
+        <div className="success-actions" style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
           <Button
             type="primary"
             onClick={() => navigate('/')}
@@ -23,6 +23,14 @@ const OrderSuccess = () => {
             icon={<ArrowLeftOutlined />}
           >
             Tiếp tục mua sắm
+          </Button>
+          <Button
+            onClick={() => navigate('/history')}
+            className="btn-view-history"
+            icon={<HistoryOutlined />}
+            style={{ height: '48px', borderRadius: '8px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            Xem lịch sử đơn hàng
           </Button>
         </div>
       </div>
