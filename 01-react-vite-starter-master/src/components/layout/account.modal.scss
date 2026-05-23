@@ -1,0 +1,139 @@
+/* Custom styles for Ant Design Account Modal */
+
+.custom-account-modal {
+  .ant-modal-content {
+    border-radius: 16px !important;
+    padding: 24px 24px 16px !important;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .ant-modal-header {
+    margin-bottom: 16px;
+    
+    .ant-modal-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1f1f1f;
+    }
+  }
+
+  /* Antd Tabs Customizations */
+  .ant-tabs-nav {
+    margin-bottom: 24px !important;
+    
+    .ant-tabs-tab {
+      font-size: 15px;
+      font-weight: 600;
+      color: #8c8c8c;
+      padding: 8px 0 12px 0;
+      
+      &:hover {
+        color: #1677ff;
+      }
+      
+      &.ant-tabs-tab-active .ant-tabs-tab-btn {
+        color: #1677ff !important;
+        font-weight: 700;
+      }
+    }
+    
+    .ant-tabs-ink-bar {
+      background: #0958d9 !important; /* Dark blue underline */
+      height: 3px !important;
+      border-radius: 3px 3px 0 0;
+    }
+  }
+}
+
+/* Tab 1: Profile update layout */
+.avatar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  padding-bottom: 16px;
+
+  .avatar-circle {
+    width: 140px;
+    height: 140px;
+    border: 3px solid #e8e8e8;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: border-color 0.3s ease;
+
+    &:hover {
+      border-color: #1677ff;
+    }
+  }
+
+  .avatar-hint {
+    font-size: 12px;
+    color: #8c8c8c;
+  }
+}
+
+/* Custom form group spacing */
+.form-item-custom {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #262626;
+
+    .required-star {
+      color: #ff4d4f;
+      margin-right: 4px;
+    }
+  }
+
+  .ant-input, .ant-input-password {
+    height: 40px;
+    border-radius: 6px;
+    font-size: 14px;
+    
+    &:focus, &-focused {
+      border-color: #1677ff;
+      box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.15);
+    }
+  }
+
+  .ant-input[disabled] {
+    background-color: #f5f5f5;
+    color: #8c8c8c;
+    cursor: not-allowed;
+    border-color: #d9d9d9;
+  }
+}
+
+/* Password Form layout width limit */
+.password-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 8px 0;
+}
+
+/* Button overrides */
+.btn-outline-custom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 6px !important;
+  font-weight: 500;
+  height: 38px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-custom {
+  border-radius: 6px !important;
+  font-weight: 600;
+  height: 40px;
+  box-shadow: 0 2px 4px rgba(22, 119, 255, 0.2) !important;
+  transition: all 0.2s ease;
+}

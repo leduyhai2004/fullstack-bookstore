@@ -10,9 +10,11 @@ import './app.header.scss';
 import { Link } from 'react-router-dom';
 import { useCurrentApp } from '../context/app.context';
 import { logoutAPI } from '../../services/api';
+import AccountModal from './account.modal';
 
-const AppHeader = (props: any) => {
+const AppHeader = () => {
     const [openDrawer, setOpenDrawer] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { isAuthenticated, user ,setUser, setIsAuthenticated, cart} = useCurrentApp();
 
@@ -35,7 +37,7 @@ const AppHeader = (props: any) => {
         {
             label: <label
                 style={{ cursor: 'pointer' }}
-                onClick={() => alert("me")}
+                onClick={() => setIsModalOpen(true)}
             >Quản lý tài khoản</label>,
             key: 'account',
         },
@@ -154,13 +156,25 @@ const AppHeader = (props: any) => {
                 onClose={() => setOpenDrawer(false)}
                 open={openDrawer}
             >
-                <p>Quản lý tài khoản</p>
+                <p 
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                        setIsModalOpen(true);
+                        setOpenDrawer(false);
+                    }}
+                >
+                    Quản lý tài khoản
+                </p>
                 <Divider />
 
-                <p onClick={handleLogout}>Đăng xuất</p>
+                <p onClick={handleLogout} style={{ cursor: 'pointer' }}>Đăng xuất</p>
                 <Divider />
             </Drawer>
 
+            <AccountModal 
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
         </>
     )
 };

@@ -41,8 +41,12 @@ export const createListUserAPI = ( data: {
 }
 
 
-export const updateUserAPI = ( _id: string, fullName : string, phone : string ) => {
-    return axios.put<IBackendRes<IRegister>>(`api/v1/user`, { _id ,fullName, phone });
+export const updateUserAPI = ( _id: string, fullName : string, phone : string, avatar?: string ) => {
+    return axios.put<IBackendRes<IRegister>>(`api/v1/user`, { _id ,fullName, phone, avatar });
+}
+
+export const changePasswordAPI = (email: string, oldpass: string, newpass: string) => {
+    return axios.post<IBackendRes<any>>('api/v1/user/change-password', { email, oldpass, newpass });
 }
 
 export const deleteUserAPI = ( _id: string ) => {
