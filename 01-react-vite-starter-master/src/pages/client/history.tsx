@@ -49,148 +49,13 @@ const HistoryPage = () => {
     fetchHistory();
   }, []);
 
-  // 2. Predefined Mock Data exactly as requested (6 rows, date 20-11-2024)
-  const mockOrders: IOrderHistory[] = useMemo(() => [
-    {
-      _id: 'mock-1',
-      name: 'Khách hàng Demo 1',
-      type: 'COD',
-      email: 'demo1@example.com',
-      phone: '0987654321',
-      userId: 'mock-user',
-      totalPrice: 171000,
-      paymentStatus: 'Thành công',
-      paymentRef: 'COD_REF_1',
-      createdAt: '2024-11-20T10:00:00.000Z',
-      updatedAt: '2024-11-20T10:00:00.000Z',
-      __v: 0,
-      detail: [
-        {
-          _id: 'book-mock-1',
-          bookName: 'Sách học React TypeScript nâng cao',
-          quantity: 1
-        }
-      ]
-    },
-    {
-      _id: 'mock-2',
-      name: 'Khách hàng Demo 2',
-      type: 'BANKING',
-      email: 'demo2@example.com',
-      phone: '0987654322',
-      userId: 'mock-user',
-      totalPrice: 820000,
-      paymentStatus: 'Thành công',
-      paymentRef: 'BANK_REF_2',
-      createdAt: '2024-11-20T11:30:00.000Z',
-      updatedAt: '2024-11-20T11:30:00.000Z',
-      __v: 0,
-      detail: [
-        {
-          _id: 'book-mock-2',
-          bookName: 'Fullstack Web Development với Node.js & React',
-          quantity: 2
-        }
-      ]
-    },
-    {
-      _id: 'mock-3',
-      name: 'Khách hàng Demo 3',
-      type: 'COD',
-      email: 'demo3@example.com',
-      phone: '0987654323',
-      userId: 'mock-user',
-      totalPrice: 171000,
-      paymentStatus: 'Thành công',
-      paymentRef: 'COD_REF_3',
-      createdAt: '2024-11-20T13:15:00.000Z',
-      updatedAt: '2024-11-20T13:15:00.000Z',
-      __v: 0,
-      detail: [
-        {
-          _id: 'book-mock-1',
-          bookName: 'Sách học React TypeScript nâng cao',
-          quantity: 1
-        }
-      ]
-    },
-    {
-      _id: 'mock-4',
-      name: 'Khách hàng Demo 4',
-      type: 'BANKING',
-      email: 'demo4@example.com',
-      phone: '0987654324',
-      userId: 'mock-user',
-      totalPrice: 820000,
-      paymentStatus: 'Thành công',
-      paymentRef: 'BANK_REF_4',
-      createdAt: '2024-11-20T14:45:00.000Z',
-      updatedAt: '2024-11-20T14:45:00.000Z',
-      __v: 0,
-      detail: [
-        {
-          _id: 'book-mock-2',
-          bookName: 'Fullstack Web Development với Node.js & React',
-          quantity: 2
-        }
-      ]
-    },
-    {
-      _id: 'mock-5',
-      name: 'Khách hàng Demo 5',
-      type: 'COD',
-      email: 'demo5@example.com',
-      phone: '0987654325',
-      userId: 'mock-user',
-      totalPrice: 171000,
-      paymentStatus: 'Thành công',
-      paymentRef: 'COD_REF_5',
-      createdAt: '2024-11-20T16:00:00.000Z',
-      updatedAt: '2024-11-20T16:00:00.000Z',
-      __v: 0,
-      detail: [
-        {
-          _id: 'book-mock-1',
-          bookName: 'Sách học React TypeScript nâng cao',
-          quantity: 1
-        }
-      ]
-    },
-    {
-      _id: 'mock-6',
-      name: 'Khách hàng Demo 6',
-      type: 'COD',
-      email: 'demo6@example.com',
-      phone: '0987654326',
-      userId: 'mock-user',
-      totalPrice: 171000,
-      paymentStatus: 'Thành công',
-      paymentRef: 'COD_REF_6',
-      createdAt: '2024-11-20T17:20:00.000Z',
-      updatedAt: '2024-11-20T17:20:00.000Z',
-      __v: 0,
-      detail: [
-        {
-          _id: 'book-mock-1',
-          bookName: 'Sách học React TypeScript nâng cao',
-          quantity: 1
-        }
-      ]
-    }
-  ], []);
 
-  // 3. Combine Real + Mock Data
-  // Place real orders first, and mock orders next to always fulfill the user's specific mock items request
-  const allOrders = useMemo(() => {
-    return [...orderList, ...mockOrders];
-  }, [orderList, mockOrders]);
-
-  // 4. Client-side Paginations
-  const totalPages = Math.ceil(allOrders.length / pageSize) || 1;
+  // 2. Client-side Pagination
+  const totalPages = Math.ceil(orderList.length / pageSize) || 1;
   const paginatedOrders = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
-    return allOrders.slice(startIndex, startIndex + pageSize);
-  }, [allOrders, currentPage]);
+    return orderList.slice(startIndex, startIndex + pageSize);
+  }, [orderList, currentPage]);
 
   const handleOpenDetails = (order: IOrderHistory) => {
     setSelectedOrder(order);
@@ -206,7 +71,7 @@ const HistoryPage = () => {
           <div className="history-spinner-wrapper">
             <Spin size="large" tip="Đang tải lịch sử mua sắm..." />
           </div>
-        ) : allOrders.length > 0 ? (
+        ) : orderList.length > 0 ? (
           <div className="history-content-wrapper">
             {/* Table Layout Wrapper with horizontal scroll responsive */}
             <div className="history-table-responsive">
