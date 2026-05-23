@@ -96,7 +96,7 @@ interface IBookTable{
 }
 
 interface ICart {
-    _id : String
+    _id : string
     quantity : number
     detail : IBookTable
 }

@@ -20,6 +20,7 @@ import RegisterPage from './pages/client/auth/register';
 import { AppProvider } from './components/context/app.context';
 import enUS  from  "antd/locale/en_US";
 import BookDetailPage from './pages/client/bookDetail';
+import OrderPage from './pages/client/cart';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -46,6 +47,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <div>checkout page</div>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/order",
+        element: (
+          <ProtectedRoute>
+            <OrderPage />
           </ProtectedRoute>
         ),
       }

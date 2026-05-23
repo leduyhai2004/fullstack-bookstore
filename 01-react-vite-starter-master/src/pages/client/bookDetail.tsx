@@ -56,7 +56,7 @@ const BookDetailPage = () => {
   // Selected Purchase Quantity
   const [selectedQty, setSelectedQty] = useState<number>(1);
 
-  const {cart, setCart} = useCurrentApp();
+  const { setCart } = useCurrentApp();
 
   useEffect(() => {
     const fetchBookDetail = async () => {
